@@ -7,70 +7,21 @@ import {
   Package, 
   Phone,
   Wind,
-  Shield
+  Shield,
+  Sparkles
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
+  const navigate = useNavigate();
+  
   const evacuationZones = [
     { zone: "A", risk: "Extreme", description: "Coastal areas", color: "bg-red-100 border-red-500 text-red-800" },
     { zone: "B", risk: "High", description: "Near coast", color: "bg-orange-100 border-orange-500 text-orange-800" },
     { zone: "C", risk: "Moderate", description: "Inland areas", color: "bg-yellow-100 border-yellow-500 text-yellow-800" },
   ];
 
-  const essentialSupplies = [
-    "Water (1 gallon per person per day for 3-7 days)",
-    "Non-perishable food (3-7 day supply)",
-    "Flashlight and extra batteries",
-    "Battery-powered or hand crank radio",
-    "First aid kit",
-    "Prescription medications (7-day supply)",
-    "Important documents in waterproof bag",
-    "Cash and credit cards",
-    "Phone chargers and power banks",
-    "Emergency blanket",
-    "Manual can opener",
-    "Matches in waterproof container",
-    "Personal hygiene items",
-    "Change of clothing",
-    "Emergency whistle",
-    "Fire extinguisher",
-    "Baby food and formula (if needed)",
-    "Pet food and water (if needed)"
-  ];
-
-  const downloadChecklist = () => {
-    const checklistText = `FLORIDA HURRICANE EMERGENCY SUPPLY CHECKLIST
-
-Essential Items for Hurricane Preparedness:
-
-${essentialSupplies.map((item, index) => `${index + 1}. ${item}`).join('\n')}
-
-IMPORTANT REMINDERS:
-- Store supplies in waterproof containers
-- Keep emergency kit easily accessible
-- Update expired items regularly
-- Have a family emergency plan
-- Know your evacuation zone
-
-Emergency Contacts:
-- Emergency Services: 911
-- Florida Emergency Management: 1-800-342-3557
-- Red Cross Shelters: 1-800-733-2767
-
-For more information visit: www.floridadisaster.org
-
-Stay safe and stay prepared!`;
-
-    const blob = new Blob([checklistText], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'Florida_Hurricane_Emergency_Checklist.txt';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
+  
 
   return (
     <div className="min-h-screen bg-background">
@@ -164,18 +115,18 @@ Stay safe and stay prepared!`;
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-2">
-              {essentialSupplies.map((item, index) => (
-                <div key={index} className="flex items-center gap-3 p-2 border rounded">
-                  <input type="checkbox" className="rounded" />
-                  <span className="text-sm">{item}</span>
-                </div>
-              ))}
+            <div className="text-center p-6">
+              <p className="text-lg mb-4">Get a supply list tailored to your family's specific needs</p>
+              <p className="text-sm text-muted-foreground mb-6">Our AI will create a personalized checklist based on your family size, pets, and other requirements</p>
+              <Button 
+                onClick={() => navigate('/ai-supply-list')} 
+                className="w-full" 
+                variant="default"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Create My Personalized Supply List
+              </Button>
             </div>
-            <Button onClick={downloadChecklist} className="w-full mt-4" variant="outline">
-              <Package className="h-4 w-4 mr-2" />
-              Download Complete Checklist
-            </Button>
           </CardContent>
         </Card>
 
