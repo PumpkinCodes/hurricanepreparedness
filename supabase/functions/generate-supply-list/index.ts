@@ -31,7 +31,7 @@ serve(async (req) => {
         messages: [
           { 
             role: 'system', 
-            content: 'You are an emergency preparedness expert. Create detailed, practical hurricane supply lists with specific quantities and considerations. Format responses as numbered lists with clear categories like Water & Food, Medical Supplies, Communication & Power, etc.'
+            content: 'You are an emergency preparedness expert specializing in hurricane preparedness. Create comprehensive, detailed hurricane supply lists with specific quantities, brand recommendations, storage instructions, and usage tips. For each item, include: exact quantities needed per person/pet, recommended brands or specifications, storage requirements, expiration considerations, and why the item is essential. Organize into clear categories: Water & Hydration, Food & Nutrition, Medical & Health, Communication & Power, Safety & Tools, Shelter & Comfort, Personal Care, Important Documents, Pet Supplies (if applicable), and Special Needs items. Include preparation timeline suggestions and priority levels for each category.'
           },
           { role: 'user', content: prompt }
         ],
