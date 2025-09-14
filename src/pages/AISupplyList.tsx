@@ -52,17 +52,70 @@ const AISupplyList = () => {
       setGeneratedText(text);
 
       
-      let supplies = text
-        .split('\n')
-        .filter((line: string) => /^\s*\d+[\).\s]/.test(line.trim()))
-        .map((line: string) => line.replace(/^\s*\d+[\).\s]*/, '').trim());
+       const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+      
+      // Filter out lines that are likely headers, categories, or user input repetition
+      const filterOutNonItems = (line: string): boolean => {
+        const lowerLine = line.toLowerCase();
+        
+        // Filter out category headers and explanatory text
+        if (lowerLine.includes('category') || 
+            lowerLine.includes('hurricane') ||
+            lowerLine.includes('family') ||
+            lowerLine.includes('preparedness') ||
+            lowerLine.includes('emergency') ||
+            lowerLine.includes('supply list') ||
+            lowerLine.includes('considerations') ||
+            lowerLine.includes('remember') ||
+            lowerLine.includes('important') ||
+            lowerLine.includes('note:') ||
+            lowerLine.includes('tips:') ||
+            lowerLine.includes('recommendations') ||
+            lowerLine.startsWith('here') ||
+            lowerLine.includes('based on') ||
+            lowerLine.includes('priority:') ||
+            lowerLine.includes('timeline:')) {
+          return false;
+        }
 
-      // Fallback to bullets ("- Item", "* Item", "• Item")
+        // Filter out lines with user input repetition
+        if (formData.familySize && lowerLine.includes(formData.familySize)) return false;
+        if (formData.childrenAges && lowerLine.includes(formData.childrenAges.toLowerCase())) return false;
+        if (formData.petTypes && lowerLine.includes(formData.petTypes.toLowerCase())) return false;
+        if (formData.specialNeeds && lowerLine.includes(formData.specialNeeds.toLowerCase())) return false;
+        
+        // Filter out overly long explanatory text (likely not a supply item)
+        if (line.length > 150) return false;
+        
+        // Filter out lines that are just section headers (all caps, colons, etc.)
+        if (/^[A-Z\s&:]+$/.test(line) && line.length < 50) return false;
+        
+        return true;
+      };
+
+     
+      let supplies = lines
+        .filter((line: string) => /^\s*\d+[\).\s]/.test(line))
+        .map((line: string) => line.replace(/^\s*\d+[\).\s]*/, '').trim())
+        .filter(filterOutNonItems)
+        .filter(item => item.length > 5 && item.length < 150); 
+
+     
       if (supplies.length === 0) {
-        supplies = text
-          .split('\n')
-          .filter((line: string) => /^\s*[-*•]\s+/.test(line.trim()))
-          .map((line: string) => line.replace(/^\s*[-*•]\s+/, '').trim());
+        supplies = lines
+          .filter((line: string) => /^\s*[-*•]\s+/.test(line))
+          .map((line: string) => line.replace(/^\s*[-*•]\s+/, '').trim())
+          .filter(filterOutNonItems)
+          .filter(item => item.length > 5 && item.length < 150);
+      }
+
+      
+      if (supplies.length === 0) {
+        supplies = lines
+          .filter((line: string) => /^[A-Z]/.test(line) && !line.endsWith(':'))
+          .filter(filterOutNonItems)
+          .filter(item => item.length > 5 && item.length < 150)
+          .slice(0, 50); 
       }
 
       setGeneratedList(supplies);
