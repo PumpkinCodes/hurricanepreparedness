@@ -14,6 +14,7 @@ const AISupplyList = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [generatedList, setGeneratedList] = useState<string[]>([]);
+  const [generatedText, setGeneratedText] = useState<string>("");
   const [formData, setFormData] = useState({
     familySize: "",
     hasChildren: false,
@@ -47,10 +48,22 @@ const AISupplyList = () => {
 
       if (error) throw error;
 
-      const supplies = data.generatedText
+      const text: string = data.generatedText || "";
+      setGeneratedText(text);
+
+      
+      let supplies = text
         .split('\n')
-        .filter((line: string) => line.trim() && /^\d+\./.test(line.trim()))
-        .map((line: string) => line.replace(/^\d+\.\s*/, '').trim());
+        .filter((line: string) => /^\s*\d+[\).\s]/.test(line.trim()))
+        .map((line: string) => line.replace(/^\s*\d+[\).\s]*/, '').trim());
+
+      // Fallback to bullets ("- Item", "* Item", "• Item")
+      if (supplies.length === 0) {
+        supplies = text
+          .split('\n')
+          .filter((line: string) => /^\s*[-*•]\s+/.test(line.trim()))
+          .map((line: string) => line.replace(/^\s*[-*•]\s+/, '').trim());
+      }
 
       setGeneratedList(supplies);
       toast.success("Personalized supply list generated!");
@@ -63,6 +76,11 @@ const AISupplyList = () => {
   };
 
   const downloadList = () => {
+     const listBody =
+      generatedList.length > 0
+        ? generatedList.map((item, index) => `${index + 1}. ${item}`).join('\n')
+        : generatedText;
+
     const listText = `PERSONALIZED HURRICANE SUPPLY LIST
 
 Family Details:
@@ -72,7 +90,7 @@ Family Details:
 - Special needs: ${formData.hasSpecialNeeds ? formData.specialNeeds : 'None'}
 
 Supply List:
-${generatedList.map((item, index) => `${index + 1}. ${item}`).join('\n')}
+${listBody}
 
 Generated on: ${new Date().toLocaleDateString()}
 Stay safe and stay prepared!`;
@@ -221,21 +239,27 @@ Stay safe and stay prepared!`;
               <CardTitle>Your Personalized Supply List</CardTitle>
             </CardHeader>
             <CardContent>
-              {generatedList.length === 0 ? (
+               {!generatedText ? (
                 <div className="text-center p-8 text-muted-foreground">
                   <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>Fill out the form and click "Generate" to get your personalized supply list</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="max-h-96 overflow-y-auto space-y-2">
-                    {generatedList.map((item, index) => (
-                      <div key={index} className="flex items-start gap-3 p-2 border rounded">
-                        <Checkbox />
-                        <span className="text-sm">{item}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {generatedList.length > 0 ? (
+                    <div className="max-h-96 overflow-y-auto space-y-2">
+                      {generatedList.map((item, index) => (
+                        <div key={index} className="flex items-start gap-3 p-2 border rounded">
+                          <Checkbox />
+                          <span className="text-sm">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="max-h-96 overflow-y-auto p-3 border rounded">
+                      <pre className="whitespace-pre-wrap text-sm">{generatedText}</pre>
+                    </div>
+                  )}
                   <Button onClick={downloadList} className="w-full" variant="outline">
                     <Download className="h-4 w-4 mr-2" />
                     Download My List
