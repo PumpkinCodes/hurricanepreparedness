@@ -63,7 +63,11 @@ const Index = () => {
             <div className="text-center p-6">
               <p className="text-lg text-muted-foreground">No active hurricane threats at this time</p>
               <p className="text-sm text-muted-foreground mt-2">Monitor conditions regularly during hurricane season (June 1 - November 30)</p>
-              <Button className="mt-4" variant="outline">
+              <Button 
+                className="mt-4" 
+                variant="outline"
+                onClick={() => window.open('https://www.nhc.noaa.gov/', '_blank')}
+              >
                 View Current Conditions
               </Button>
             </div>
